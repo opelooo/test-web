@@ -1,0 +1,52 @@
+load balancer Listener HTTPS:443 >> instance listener HTTP:80
+add the certificate contain all the domain needed
+
+configure http listener for every instance:
+
+web config in webserver
+server {
+    listen 80 default_server;
+    server_name web-alzril.opelooo.studio;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    add_header X-Server-Marker "Web Instance 2" always;
+
+    # Dedicated health check endpoint
+    location /elb-status {
+        access_log off;
+        return 200 'OK';
+        add_header Content-Type text/plain;
+    }
+
+    # Other locations can be defined here as needed
+}
+
+api config in webserver
+server {
+    listen 80;
+    server_name api-alzril.opelooo.studio;
+
+    location / {
+        proxy_pass http://172.31.0.14:80;  # Ganti dengan IP private API server
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+
+apiserver nginx config
+server {
+    listen 80;
+    server_name api-alzril.opelooo.studio;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        add_header Access-Control-Allow-Origin "http://web-alzril.opelooo.studio";
+        add_header Access-Control-Allow-Methods "GET, POST, PUT, DELETE";
+        add_header Access-Control-Allow-Headers "Authorization, Content-Type";
+        add_header Access-Control-Allow-Credentials "true";
+    }
+}
+

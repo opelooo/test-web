@@ -1,0 +1,15 @@
+==================================== setup squid proxy server
+sudo su
+
+dnf install squid -y
+
+systemctl enable squid
+systemctl start squid
+sudo nano /etc/squid/squid.conf
+
+acl my_private_net src 192.168.100.16/28
+http_access allow my_private_net
+
+# makesure http_port 3128
+
+sudo systemctl restart squid

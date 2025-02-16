@@ -1,0 +1,3 @@
+/home/ec2-user/lorem-picsum
+
+curl -o https://fastly.picsum.photos/id/23/3887/4899.jpg?hmac=2fo1Y0AgEkeL2juaEBqKPbnEKm_5Mp0M2nuaVERE6eE

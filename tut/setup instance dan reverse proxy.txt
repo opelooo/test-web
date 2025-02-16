@@ -1,0 +1,63 @@
+========================================= web-server: 192.168.100.0/27
+public-1    192.168.100.5
+public-2    192.168.100.4
+private     192.168.100.28
+
+
+========================================= api-server: 172.31.0.0/27
+public      172.31.0.14
+private     172.31.0.29
+
+
+
+========================================= setup instance:
+sudo su
+
+dnf update -y
+dnf install nginx nmap certbot python3-certbot-nginx firewalld -y
+systemctl start nginx
+systemctl enable nginx
+
+sudo systemctl start firewalld
+sudo firewall-cmd --permanent --add-service=ssh
+sudo firewall-cmd --permanent --add-service=http
+sudo firewall-cmd --permanent --add-service=https
+sudo firewall-cmd --reload
+sudo firewall-cmd --list-all
+
+nano /usr/share/nginx/html/index.html
+
+========================================= setup custom web config:
+nano /etc/nginx/conf.d/web.conf
+
+server {
+    listen 80;
+    server_name web-alzril.opelooo.studio;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    location / {
+        try_files $uri $uri/ =404;
+    }
+}
+
+========================================= configure reverse proxy to API server
+nano /etc/nginx/conf.d/api.conf
+
+server {
+    listen 80;
+    server_name api-alzril.opelooo.studio;
+
+    location / {
+        proxy_pass http://172.31.0.14:80;  # Ganti dengan IP private API server
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}
+
+sudo nginx -t  # Validasi konfigurasi
+sudo systemctl restart nginx
+sudo certbot --nginx -d web-alzril.opelooo.studio -d api-alzril.opelooo.studio
+

@@ -1,0 +1,14 @@
+web-server-1
+  AfterInstall:
+    - location: scripts/image-storage-server1.sh
+
+web-server-2
+  AfterInstall:
+    - location: scripts/image-storage-server2.sh
+
+configurasi ssl secara manual jika menggunakan load balancer:
+- buat nginx config untuk web-alzril dan api-alzril
+- daftarkan kedua subdomain ke let's encrypt
+- copy certificate tersebut
+- daftarkan ke AWS
+- configurasi load balancer dan gunakan certificate yang berisikan web-alzril dan api-alzril

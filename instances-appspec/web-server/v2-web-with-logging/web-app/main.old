@@ -1,0 +1,51 @@
+# sudo dnf install python3-pip
+from fastapi import FastAPI, Response, Request
+from fastapi.responses import HTMLResponse, StreamingResponse
+import time
+import os
+import subprocess
+import asyncio
+
+app = FastAPI()
+
+# Path ke file log Nginx
+LOG_FILE = "/var/log/nginx/access.log"
+
+@app.get("/", response_class=HTMLResponse)
+def read_index():
+    index_path = "/usr/share/nginx/html/index.html"
+    if os.path.isfile(index_path):
+        try:
+            with open(index_path, "r", encoding="utf-8") as f:
+                content = f.read()
+            return content
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Error reading index file: {e}")
+    else:
+        raise HTTPException(status_code=404, detail="Index file not found.")
+
+@app.get("/stream-logs")
+async def stream_logs(request: Request):
+    async def log_generator():
+        process = None
+        try:
+            # Jalankan tail -f untuk membaca log secara real-time
+            process = subprocess.Popen(
+                ["tail", "-f", LOG_FILE],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True
+            )
+            while True:
+                output = process.stdout.readline()
+                if output:
+                    yield f"data: {output}\n\n"
+                else:
+                    await asyncio.sleep(2)  # Tunggu 2 detik jika tidak ada log baru
+        finally:
+            # Pastikan proses dihentikan ketika koneksi klien ditutup
+            if process:
+                process.terminate()
+                process.wait()
+
+    return StreamingResponse(log_generator(), media_type="text/event-stream")

@@ -1,0 +1,25 @@
+version: 0.0
+os: linux
+files:
+  - source: /pem/testing.pem
+    destination: /pem
+hooks:
+  BeforeInstall:
+    - location: scripts/configure-ec2.sh
+      timeout: 300
+      runas: root
+  AfterInstall:
+    - location: scripts/stetup-mariadb.sh
+      timeout: 300
+      runas: root
+  # ApplicationStart:
+  #   - location: scripts/configure-uvicorn.sh
+  #   - location: scripts/create_test_db.sh
+  #     timeout: 300
+  #     runas: root
+  # ApplicationStop:
+  #   - location: scripts/stop_server.sh
+  #     timeout: 300
+  #     runas: root
+
+

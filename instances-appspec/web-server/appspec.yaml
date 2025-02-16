@@ -1,0 +1,30 @@
+version: 0.0
+os: linux
+files:
+  - source: /pem/testing.pem
+    destination: /pem
+  - source: /v2-web-with-logging/nginx/alb-web.conf
+    destination: /etc/nginx/conf.d
+  - source: /v2-web-with-logging/nginx/alb-api.conf
+    destination: /etc/nginx/conf.d
+  - source: /v2-web-with-logging/nginx/index.html
+    destination: /usr/share/nginx/html
+  - source: /v2-web-with-logging/services/uvicorn.service
+    destination: /etc/systemd/system
+  - source: /v2-web-with-logging/web-app/
+    destination: ~/web-app
+hooks:
+  BeforeInstall:
+    - location: scripts/configure-ec2.sh
+    # manually configure ssl if using load balancer
+    # - location: scripts/certbot.sh
+      timeout: 300
+      runas: root
+  AfterInstall:
+    - location: scripts/storage-server.sh
+    # - location: scripts/squid.sh
+    - location: scripts/image-storage-server1.sh
+    # change to this if configure web server 2
+    # - location: scripts/image-storage-server1.sh
+      timeout: 300
+      runas: root

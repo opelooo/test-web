@@ -1,0 +1,29 @@
+server {
+    listen 80 default_server;
+    server_name web-alzril.opelooo.studio;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    add_header X-Server-Marker "Web Instance 2" always;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_buffering off;  # Nonaktifkan buffering
+        proxy_read_timeout 300;  # Tambahkan timeout yang lebih lama
+        proxy_connect_timeout 300;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # Dedicated health check endpoint
+    location /elb-status {
+        access_log off;
+        return 200 'OK';
+        add_header Content-Type text/plain;
+    }
+
+    # Other locations can be defined here as needed
+}
+

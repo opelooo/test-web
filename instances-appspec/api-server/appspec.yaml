@@ -1,0 +1,33 @@
+version: 0.0
+os: linux
+files:
+  - source: /app-api/
+    destination: ~/app-api
+  - source: /nginx/fastapi.conf
+    destination: /etc/nginx/conf.d
+  - source: /nginx/index.html
+    destination: /usr/share/nginx/html
+  - source: /pem/testing.pem
+    destination: /pem
+  - source: /services/uvicorn.service
+    destination: /etc/systemd/system
+hooks:
+  BeforeInstall:
+    - location: scripts/configure-ec2.sh
+      timeout: 300
+      runas: root
+  AfterInstall:
+    - location: scripts/configure-fastapi.sh
+    - location: scripts/configure-uvicorn.sh
+      timeout: 300
+      runas: root
+  # ApplicationStart:
+  #   - location: scripts/configure-uvicorn.sh
+  #   - location: scripts/create_test_db.sh
+  #     timeout: 300
+  #     runas: root
+  # ApplicationStop:
+  #   - location: scripts/stop_server.sh
+  #     timeout: 300
+  #     runas: root
+

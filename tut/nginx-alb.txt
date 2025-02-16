@@ -1,0 +1,28 @@
+nano /etc/nginx/nginx.conf
+
+upstream backend_servers {
+    # List your backend servers here.
+    server 192.168.100.5 weight=1;
+    server 192.168.100.4 weight=1;
+}
+
+server {
+        listen 443 ssl;
+        server_name your-domain.com;
+
+        ssl_certificate /etc/letsencrypt/live/your-domain.com/fullchain.pem;
+        ssl_certificate_key /etc/letsencrypt/live/your-domain.com/privkey.pem;
+
+        location / {
+            proxy_pass https://backend_servers;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+      }
+
+
+sudo systemctl enable nginx
+sudo systemctl start nginx
+

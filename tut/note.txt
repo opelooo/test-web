@@ -1,0 +1,16 @@
+iaas: ifra as a service
+paas: platform as a service
+saas: service as s service
+
+
+nfs servers
+yum -y install httpd
+yum -y install nfs-server nfs-utils > for web-server/client
+
+nfs :20049 :111 tcp, udp
+port 2049/TCP UDP port 111/TCP UDP
+masukin gambar dari web server req send
+
+pake:
+ufw --> Debian / Ubuntu
+firewalld --> RHEL, AMI, Mactos

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to the Cloud!</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to right, #1e1e1e, #121212);
+            text-align: center;
+            color: #f8f8f8;
+            padding: 50px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px rgba(255, 255, 255, 0.1);
+        }
+        h1 {
+            font-size: 36px;
+            margin-bottom: 10px;
+            color: #00d9ff;
+        }
+        p {
+            font-size: 18px;
+            color: #c7c7c7;
+        }
+        #logs-container {
+            background-color: #000000;
+            border: 2px solid #00ff00;
+            padding: 15px;
+            height: 80vh;
+            overflow-y: auto;
+        }
+
+        .log-line {
+            padding: 5px 0;
+            border-bottom: 1px solid #333;
+            word-break: break-all;
+        }
+        .footer {
+            margin-top: 20px;
+            font-size: 14px;
+            opacity: 0.6;
+            color: #bbbbbb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Welcome to the Cloud! ☁</h1>
+        <p>You’re now hosting your own custom web server using AWS EC2 and Nginx!</p>
+        <p>You are calling <strong>Nginx web-server</strong> Web instance! 🚀</p>
+        <p>Server 2 192.168.100.4</p>
+    </div>
+
+    <div class="container">
+        <h1 style="text-align: center; color: #00ff00;">NGINX ACCESS LOGS</h1>
+        <div id="logs-container">
+            <div style="text-align: left;" id="logs"></div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Powered by AWS EC2 & Nginx
+    </div>
+
+
+    <script>
+        const logsContainer = document.getElementById('logs');
+
+        const eventSource = new EventSource('/stream-logs');
+
+        eventSource.onmessage = (event) => {
+            const logLine = document.createElement('div');
+            logLine.className = 'log-line';
+            logLine.textContent = event.data;
+
+            logsContainer.appendChild(logLine);
+
+            // Auto-scroll ke bawah
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        };
+
+        eventSource.onerror = () => {
+            const errorLine = document.createElement('div');
+            errorLine.className = 'log-line';
+            errorLine.style.color = '#ff0000';
+            errorLine.textContent = '⚠ Koneksi terputus!';
+            logsContainer.appendChild(errorLine);
+        };
+    </script>
+</body>
+</html>
+

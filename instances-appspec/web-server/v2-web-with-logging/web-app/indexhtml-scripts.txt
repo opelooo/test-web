@@ -1,0 +1,20 @@
+    <script>
+        const logsContainer = document.getElementById('logs');
+        const ws = new WebSocket(`ws://${window.location.host}/ws-logs`);
+
+        ws.onmessage = (event) => {
+            const logLine = document.createElement('div');
+            logLine.className = 'log-line';
+            logLine.textContent = event.data;
+            logsContainer.appendChild(logLine);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        };
+
+        ws.onerror = () => {
+            const errorLine = document.createElement('div');
+            errorLine.className = 'log-line';
+            errorLine.style.color = '#ff0000';
+            errorLine.textContent = '⚠️ Koneksi terputus!';
+            logsContainer.appendChild(errorLine);
+        };
+    </script>

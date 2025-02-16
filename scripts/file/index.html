@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>EC2 Folder Browser</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    input[type="text"] {
+      width: 300px;
+      padding: 5px;
+      margin-right: 10px;
+    }
+    button {
+      padding: 5px 10px;
+    }
+    ul {
+      list-style-type: none;
+      padding: 0;
+    }
+    li {
+      margin: 5px 0;
+      padding: 3px;
+      border: 1px solid #ccc;
+    }
+  </style>
+</head>
+<body>
+  <h1>EC2 Folder Browser</h1>
+  <div>
+    <label for="folderPath">Folder Path:</label>
+    <input type="text" id="folderPath" value="/path/to/your/folder">
+    <button onclick="listFolder()">List Folder</button>
+  </div>
+  <div id="folderContents"></div>
+
+  <script>
+    // This function sends a GET request to a backend endpoint /list
+    // It expects a JSON response with a "files" array.
+    function listFolder() {
+      const folder = document.getElementById("folderPath").value;
+      fetch('/list?folder=' + encodeURIComponent(folder))
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          let html = '<h2>Contents of ' + folder + ':</h2>';
+          if (data.files && data.files.length > 0) {
+            html += '<ul>';
+            data.files.forEach(file => {
+              html += '<li>' + file + '</li>';
+            });
+            html += '</ul>';
+          } else {
+            html += '<p>No files found or folder is empty.</p>';
+          }
+          document.getElementById("folderContents").innerHTML = html;
+        })
+        .catch(error => {
+          document.getElementById("folderContents").innerHTML = '<p style="color:red;">Error: ' + error.message + '</p>';
+          console.error('Error:', error);
+        });
+    }
+  </script>
+</body>
+</html>

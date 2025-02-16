@@ -1,0 +1,18 @@
+# SSL test, finds sub-domain, outdated component report,
+# gives details of installed software, scan port, dictionary attack,
+# check for known vulnerabilities
+# https://www.geeksforgeeks.org/what-is-nikto-and-its-usages/
+# https://www.freecodecamp.org/news/an-introduction-to-web-server-scanning-with-nikto/
+nikto -h https://web-alzril.opelooo.studio/
+nikto -h https://api-alzril.opelooo.studio/
+
+
+# dictionary attack using common dir list, find hidden directories, sub-domains, and S3 buckets
+# https://www.freecodecamp.org/news/gobuster-tutorial-find-hidden-directories-sub-domains-and-s3-buckets/
+gobuster dir -u https://web-alzril.opelooo.studio/ -w common.txt
+gobuster dir -u https://api-alzril.opelooo.studio/ -w common.txt
+
+
+# port scan and app version detection, agressive scan
+nmap -sV -A web-alzril.opelooo.studio
+nmap -sV -A api-alzril.opelooo.studio

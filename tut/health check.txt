@@ -1,0 +1,62 @@
+sudo mkdir -p /usr/share/nginx/html/health/
+echo "Health Check OK" | sudo tee /usr/share/nginx/html/health/index.html
+
+or nginx conf
+
+server {
+    listen 80 default_server;
+    server_name _;
+
+    root /usr/share/nginx/html;
+    index index.html;
+
+    # Dedicated health check endpoint
+    location /elb-status {
+        access_log off;
+        return 200 'OK';
+        add_header Content-Type text/plain;
+    }
+
+    # Other locations can be defined here as needed
+}
+
+or https ssl
+
+server {
+    location /elb-status {
+        access_log off;
+        return 200 'OK';
+        add_header Content-Type text/plain;
+    }
+
+    if ($host = web-alzril.opelooo.studio) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+
+
+    listen 80 default_server;
+    server_name web-alzril.opelooo.studio;
+    return 404; # managed by Certbot
+
+
+}
+
+server {
+    listen 80 default_server;
+    server_name web-alzril.opelooo.studio;
+
+    # Dedicated health check endpoint: return 200 OK
+    location /elb-status {
+        access_log off;
+        return 200 'OK';
+        add_header Content-Type text/plain;
+    }
+
+    # All other requests are redirected to HTTPS
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+sudo tcpdump -i ens5 'tcp port 80 or tcp port 443' -nn -s 0 -v
+
